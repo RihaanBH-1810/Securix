@@ -31,7 +31,7 @@ def using_tcp_dump_parallel():
     for process in processes:
         process.join()
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     set_kernel_params()  
     show_all_tcp_session()  
     using_tcp_dump_parallel()
