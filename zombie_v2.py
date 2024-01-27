@@ -1,8 +1,5 @@
 import psutil
 import threading
-import os
-import signal
-import queue
 import subprocess
 
 p_z = []
@@ -65,10 +62,22 @@ def kill(kill_list):
                 pid = str(con.pid)
                 subprocess.call(["sudo", "kill", "-9", pid])
 
+def set_kernel_params():
+    commands = [
+        ["sudo", "sysctl", "-w", "net.ipv4.tcp_keepalive_intvl= 1"],
+        ["sudo", "sysctl", "-w", "net.ipv4.tcp_keepalive_probes= 5"],
+        ["sudo", "sysctl", "-w", "net.ipv4.tcp_keepalive_time= 10"],
+        ["sudo","sysctl","--system"]]
+
+    for command in commands:
+        subprocess.call(command)
+
 
 if __name__ == "__main__":
+    set_kernel_params()
     check_probable_zombies()
     set_timer()
     execute()
     if kill_list != []:
+        print("These are some probable zombie tcp sessions : ")
         kill(kill_list)
