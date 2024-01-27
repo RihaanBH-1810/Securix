@@ -69,7 +69,7 @@ def set_kernel_params():
         subprocess.call(command)
 
 
-if __name__ == "__main__":
+def run():
     set_kernel_params()
     check_probable_zombies()
     set_timer()
