@@ -12,3 +12,4 @@
 * run cmd : ```source/py_run.sh```
 *  and to finally run it : ```zombie_kill```
 
+# There is another script in the dev branch which can save all the tcp packets going back and forth from the ports into respective files if you want to analyse the ports
