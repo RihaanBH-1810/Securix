@@ -8,5 +8,5 @@ for module in "${required_modules[@]}"; do
     fi
 done
 
-python3 main.py
+alias zombie_kill="python3 main.py"
 
