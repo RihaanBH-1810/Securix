@@ -6,27 +6,34 @@ not_interested = ["LISTEN", "NONE", "SYN_SENT"]
 connections_list = []
 working = []
 zombie = []
-
-def probe_the_port(ip, port, ip6=False, result_queue=None, zombie_queue=None):
-    if ip6:
-        packet = IPv6(dst=ip) / TCP(dport=port, flags="S")
-        ans, _ = sr(packet, timeout=5,)
-    else:
-        packet = IP(dst=ip) / TCP(dport=port, flags="S")
-        ans, _ = sr(packet, timeout=5)
-    if ans:
-        result_queue.put((ip, ans[0][1].sprintf('%TCP.flags%')))
-    else:
-        zombie_queue.put((ip, port))    
-
 result_queue = Queue()
 zombie_queue = Queue()
+processes = []
 
 for con in psutil.net_connections():
     if con.status not in not_interested:
         connections_list.append(con)
 
-processes = []
+def probe_the_port(ip, port, ip6=False, result_queue=None, zombie_queue=None):
+    zombie_count = 0
+    working_count = 0
+    for i in range(7):
+        if ip6:
+            packet = IPv6(dst=ip) / TCP(dport=port, flags="S", )
+            ans, _ = sr(packet, timeout=1,verbose = False )
+        else:
+            packet = IP(dst=ip) / TCP(dport=port, flags="S", )
+            ans, unanswered = sr(packet, timeout=1, verbose = False)
+        if ans:
+            working_count += 1
+        else:
+            zombie_count += 1  
+    print(f"ip {ip} port {port} zombie count {zombie_count} working count {working_count}")
+    if zombie_count == 7:
+        zombie_queue.put((ip, port))  
+    else:
+        result_queue.put((ip, ans[0][1].sprintf('%TCP.flags%')))
+
 if connections_list:
     for con in connections_list:
         print(con.raddr)
