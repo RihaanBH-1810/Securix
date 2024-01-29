@@ -3,6 +3,9 @@ from scapy.all import sr, IP, TCP, IPv6
 from multiprocessing import Process, Queue
 import subprocess
 from apscheduler.schedulers.background import BackgroundScheduler
+from colorama import Fore
+import logging, os
+from datetime import datetime
 
 not_interested = ["LISTEN", "NONE", "SYN_SENT"]
 connections_list = []
@@ -12,6 +15,21 @@ processes = []
 result_queue = Queue()
 zombie_queue = Queue()
 sched = BackgroundScheduler()
+banner = Fore.RED +  """
+  ██████ ▓█████  ▄████▄   █    ██  ██▀███   ██▓   ▒██   ██▒
+▒██    ▒ ▓█   ▀ ▒██▀ ▀█   ██  ▓██▒▓██ ▒ ██▒▓██▒   ▒▒ █ █ ▒░
+░ ▓██▄   ▒███   ▒▓█    ▄ ▓██  ▒██░▓██ ░▄█ ▒▒██▒   ░░  █   ░
+  ▒   ██▒▒▓█  ▄ ▒▓▓▄ ▄██▒▓▓█  ░██░▒██▀▀█▄  ░██░    ░ █ █ ▒ 
+▒██████▒▒░▒████▒▒ ▓███▀ ░▒▒█████▓ ░██▓ ▒██▒░██░   ▒██▒ ▒██▒
+▒ ▒▓▒ ▒ ░░░ ▒░ ░░ ░▒ ▒  ░░▒▓▒ ▒ ▒ ░ ▒▓ ░▒▓░░▓     ▒▒ ░ ░▓ ░
+░ ░▒  ░ ░ ░ ░  ░  ░  ▒   ░░▒░ ░ ░   ░▒ ░ ▒░ ▒ ░   ░░   ░▒ ░
+░  ░  ░     ░   ░         ░░░ ░ ░   ░░   ░  ▒ ░    ░    ░  
+      ░     ░  ░░ ░         ░        ░      ░      ░    ░  
+                ░                                          
+"""  + Fore.RESET
+sudo_message = Fore.RED + "You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting " + Fore.RESET
+line = "------------------------------------------------------------------------------------------------------"
+
 
 def dispose():
     connections_list.clear()
@@ -40,9 +58,9 @@ def probe_the_port(ip, port, pid, l_ip, l_port,  ip6=False, result_queue=None, z
             zombie_count += 1  
 
     if zombie_count == 7:
-        zombie_queue.put((ip, port, l_ip, l_port, pid, ))  
+        zombie_queue.put((ip, port, l_ip, l_port, pid, datetime.now()))  
     else:
-        result_queue.put((ip, ans[0][1].sprintf('%TCP.flags%')))
+        result_queue.put((ip, port, l_ip, l_port, ans[0][1].sprintf('%TCP.flags%'), datetime.now))
 
 def start_scan():
     if connections_list:
@@ -68,6 +86,9 @@ def start_scan():
     while not zombie_queue.empty():
         zombie_result = zombie_queue.get()
         zombie_list.append(zombie_result)
+
+def display():
+    pass
 
 
 def kill():
@@ -99,6 +120,10 @@ def z_kill():
     dispose()
 
 if __name__ == "__main__":
+    if os.geteuid() != 0:
+        print(banner + "\n" + line + "\n" + sudo_message +"\n"+  line) 
+        exit()   
+    print(banner)
     sched.add_job(z_kill, 'interval', seconds=20)
     sched.start()
     while True:
