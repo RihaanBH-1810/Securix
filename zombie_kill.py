@@ -3,7 +3,7 @@ from scapy.all import sr, IP, TCP, IPv6
 from multiprocessing import Process, Queue
 import subprocess
 from apscheduler.schedulers.background import BackgroundScheduler
-from colorama import Fore
+from colorama import Fore, Back, Style
 import logging, os
 from datetime import datetime
 
@@ -12,9 +12,12 @@ connections_list = []
 working = []
 zombie_list = []
 processes = []
+ignored_list = []
 result_queue = Queue()
 zombie_queue = Queue()
 sched = BackgroundScheduler()
+
+
 banner = Fore.RED +  """
   ██████ ▓█████  ▄████▄   █    ██  ██▀███   ██▓   ▒██   ██▒
 ▒██    ▒ ▓█   ▀ ▒██▀ ▀█   ██  ▓██▒▓██ ▒ ██▒▓██▒   ▒▒ █ █ ▒░
@@ -36,11 +39,14 @@ def dispose():
     working.clear()
     zombie_list.clear()
     processes.clear()
+    ignored_list.clear()
 
 def setup():
     for con in psutil.net_connections():
         if con.status not in not_interested:
             connections_list.append(con)
+        else: 
+            ignored_list.append(con)
 
 def probe_the_port(ip, port, pid, l_ip, l_port,  ip6=False, result_queue=None, zombie_queue=None):
     zombie_count = 0
@@ -64,8 +70,6 @@ def probe_the_port(ip, port, pid, l_ip, l_port,  ip6=False, result_queue=None, z
 
 def start_scan():
     if connections_list:
-        for con in connections_list:
-            print(con.raddr)
         for connection in connections_list:
             if str(connection.family) == "AddressFamily.AF_INET6":
                 process = Process(target=probe_the_port, args=(connection.raddr[0], connection.raddr[1],connection.pid, connection.laddr[0], connection.laddr[1] , True, result_queue, zombie_queue))
@@ -87,8 +91,14 @@ def start_scan():
         zombie_result = zombie_queue.get()
         zombie_list.append(zombie_result)
 
+#( 'family',  'laddr', 'raddr', 'status', 'pid')
+
 def display():
-    pass
+    print(Fore.WHITE + "Currently running TCP sessions that will be monitored  : " + Fore.RESET)
+    print(f"ADDR FAMILY L_IP L_PORT R_IP R_PORT PROCESS_ID ")
+    for con in connections_list:
+        print(Back.RED + f"{con.family}" + Back.RESET)
+
 
 
 def kill():
@@ -116,7 +126,8 @@ def kill():
 def z_kill():
     setup()
     start_scan()
-    kill()
+    display()
+    #kill()
     dispose()
 
 if __name__ == "__main__":
