@@ -1,15 +1,17 @@
-import psutil
+import psutil, time
 from scapy.all import sr, IP, TCP, IPv6
 from multiprocessing import Process, Queue
 import subprocess
+from apscheduler.schedulers.background import BackgroundScheduler
 
 not_interested = ["LISTEN", "NONE", "SYN_SENT"]
 connections_list = []
 working = []
 zombie_list = []
+processes = []
 result_queue = Queue()
 zombie_queue = Queue()
-processes = []
+sched = BackgroundScheduler()
 
 def dispose():
     connections_list.clear()
@@ -17,8 +19,7 @@ def dispose():
     zombie_list.clear()
     processes.clear()
 
-
-def get_connections():
+def setup():
     for con in psutil.net_connections():
         if con.status not in not_interested:
             connections_list.append(con)
@@ -88,12 +89,18 @@ def kill():
             if pid == None:
                 print(f"found without pid on port {zombie[3]}")
     else:
-
         print("No Zombies detected !!! ")
 
 
-if __name__ == "__main__":
-    get_connections()
+def z_kill():
+    setup()
     start_scan()
     kill()
     dispose()
+
+if __name__ == "__main__":
+    sched.add_job(z_kill, 'interval', seconds=20)
+    sched.start()
+    while True:
+        time.sleep(1)
+
