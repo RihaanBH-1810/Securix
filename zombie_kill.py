@@ -17,7 +17,7 @@ for con in psutil.net_connections():
 
 def probe_the_port(ip, port, pid, l_ip, l_port,  ip6=False, result_queue=None, zombie_queue=None):
     zombie_count = 0
-    working_count = 0
+    
     for i in range(7):
         if ip6:
             packet = IPv6(dst=ip) / TCP(dport=port, flags="S",)
@@ -25,11 +25,11 @@ def probe_the_port(ip, port, pid, l_ip, l_port,  ip6=False, result_queue=None, z
         else:
             packet = IP(dst=ip) / TCP(dport=port, flags="S", )
             ans, unanswered = sr(packet, timeout=1, verbose = False)
-        if ans:
-            working_count += 1
+        if ans:           
+            break
         else:
             zombie_count += 1  
-    #print(f"ip {ip} port {port} pid {pid} l_ip = {l_ip} l_port = {l_port} zombie count {zombie_count} working count {working_count}")
+
     if zombie_count == 7:
         zombie_queue.put((ip, port, l_ip, l_port, pid, ))  
     else:
@@ -63,16 +63,19 @@ print("Working:")
 for work in working:
     print(work)
 
-print("Zombie:")
-for zombie in zombie_list:
-    print(f"Killing connection on local port {zombie[4]}")
-    pid = zombie[4]
-    print(zombie)
-    print(pid)
-    if pid != None:
-       s_pid = str(pid)
-       subprocess.call(["kill", "-9", s_pid])
-    
-    if pid == None:
-        print(f"found without pid on port {zombie[3]}")
+if len(zombie_list) != 0:
+    print("Zombie:")
+    for zombie in zombie_list:
+        print(f"Killing connection on local port {zombie[4]}")
+        pid = zombie[4]
+        print(zombie)
+        print(pid)
+        if pid != None:
+            s_pid = str(pid)
+            subprocess.call(["kill", "-9", s_pid])
+        
+        if pid == None:
+            print(f"found without pid on port {zombie[3]}")
+else:
+    print("No Zombies detected !!! ")
 
