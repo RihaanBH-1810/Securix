@@ -10,3 +10,4 @@ done
 alias zombie_kill="sudo python3 -c 'import main; main.once()'"
 alias timed_kill="sudo python3 -c 'import main; main.timer()'"
 alias background_run="sudo python3 -c 'import main; main.background()'"
+alias params="sudo python3 -c 'import main; main.set_params'"
