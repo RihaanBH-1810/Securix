@@ -260,11 +260,13 @@ def z_kill():
 if __name__ == "__main__":
     if os.geteuid() != 0:
         print(banner + "\n" + line + "\n" + sudo_message +"\n"+  line) 
-        exit()   
-    print(banner)
-    z_kill()
-    #sched.add_job(z_kill, 'interval', seconds=20)
-    #sched.start()
-    #while True:
-    #    time.sleep(1)
+        exit()
+    if cli_mode == True:
+        print(banner)
+        z_kill()
+    if cli_mode == False:
+        sched.add_job(z_kill, 'interval', seconds=20)
+        sched.start()
+        while True:
+            time.sleep(1)
 
