@@ -1,9 +1,9 @@
-required_modules=("psutil" "sockets" "scapy")
+required_modules=("psutil" "scapy" "apscheduler")
 
 for module in "${required_modules[@]}"; do
     if ! python3 -c "import $module" &> /dev/null; then
         echo "Installing $module..."
-        pip3 install "$module"
+        sudo apt-get install -y python3-"$module" 
     fi
 done
 

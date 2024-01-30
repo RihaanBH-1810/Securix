@@ -18,7 +18,7 @@ result_queue = Queue()
 zombie_queue = Queue()
 sched = BackgroundScheduler()
 cli_mode = False
-logging.basicConfig(level=logging.INFO, filename="output.log", filemode="a",  format=' %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, filename="./tcp_zombie_terminator/output.log", filemode="a",  format=' %(levelname)s - %(message)s')
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 banner = Fore.RED +  """
   ██████ ▓█████  ▄████▄   █    ██  ██▀███   ██▓   ▒██   ██▒
