@@ -294,5 +294,3 @@ def set_kernel_params():
     for command in commands:
         subprocess.call(command)
 
-if __name__ == "__main__":
-	run(True, False)
