@@ -10,6 +10,8 @@
 
 # How to run:
 
-* run cmd : ```source/py_run.sh```
-*  and to finally run it : ```zombie_kill```
-
+* To setup run cmd : ```source/py_run.sh```
+* To run the script once in terminal with output: ```zombie_kill```
+* To run the script in background: ```timed_kill```
+* To set the kernel params for keep alive: ```params```
+   
