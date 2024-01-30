@@ -110,12 +110,12 @@ def display():
         keys = ['R_IP', 'R_PORT', 'L_IP', 'L_PORT', 'STATE', 'TIME']
         print(
             Back.WHITE + Fore.BLACK +
-            f"{keys[5]:<29} "
-            f"{keys[0]:<10} "
-            f"{keys[1]:<13} "
-            f"{keys[2]:<12} "
-            f"{keys[3]:<15} "
-            f"{keys[4]:<10} "
+            f"{keys[5]:<39} "
+            f"{keys[0]:<20} "
+            f"{keys[1]:<23} "
+            f"{keys[2]:<22} "
+            f"{keys[3]:<25} "
+            f"{keys[4]:<20} "
             +
             Back.RESET + Fore.RESET
         )
@@ -123,12 +123,12 @@ def display():
             #print(f"R_IP: {con.raddr[0]} R_PORT: {con.raddr[1]} L_IP: {con.laddr[0]} L_PORT: {con.laddr[1]} STATE: {con.status}")
             print(
                 Back.BLACK + Fore.WHITE +
-                f"{current_time:<25} "
+                f"{current_time:<35} "
                 f"{con.raddr[0]:<15} "
-                f"{con.raddr[1]:<10} "
-                f"{con.laddr[0]:<15} "
-                f"{con.laddr[1]:<10} "
-                f"{con.status:<10} "
+                f"{con.raddr[1]:<20} "
+                f"{con.laddr[0]:<25} "
+                f"{con.laddr[1]:<20} "
+                f"{con.status:<20} "
                 +
                 Back.RESET + Fore.RESET
             )
@@ -139,25 +139,25 @@ def display():
         
         print(
             Back.WHITE + Fore.BLACK +
-            f"{keys[5]:<29} "
+            f"{keys[5]:<39} "
             f"{keys[0]:<10} "
-            f"{keys[1]:<13} "
-            f"{keys[2]:<12} "
-            f"{keys[3]:<10} "
-            f"{keys[6]:<12} "
-            f"{keys[4]:<10} "
+            f"{keys[1]:<23} "
+            f"{keys[2]:<22} "
+            f"{keys[3]:<20} "
+            f"{keys[6]:<22} "
+            f"{keys[4]:<20} "
             +
             Back.RESET + Fore.RESET
         )
         for work in working:
             print(
                 Back.BLACK + Fore.GREEN +
-                f"{work[5]:<25} "
+                f"{work[5]:<35} "
                 f"{work[0]:<15} "
-                f"{work[1]:<10} "
-                f"{work[2]:<15} "
-                f"{work[3]:<10} "
-                f"{work[4]:<10} "
+                f"{work[1]:<20} "
+                f"{work[2]:<25} "
+                f"{work[3]:<20} "
+                f"{work[4]:<20} "
                 "working" +
                 Back.RESET + Fore.RESET
             )
@@ -166,13 +166,13 @@ def display():
             keys = ['R_IP', 'R_PORT', 'L_IP', 'L_PORT', 'STATE', 'TIME', 'PID']
             print(
             Back.WHITE + Fore.BLACK +
-            f"{keys[5]:<29} "
+            f"{keys[5]:<39} "
             f"{keys[0]:<10} "
-            f"{keys[1]:<13} "
-            f"{keys[2]:<12} "
-            f"{keys[3]:<10} "
-            f"{keys[6]:<12} "
-            f"{keys[4]:<10} "
+            f"{keys[1]:<23} "
+            f"{keys[2]:<22} "
+            f"{keys[3]:<20} "
+            f"{keys[6]:<22} "
+            f"{keys[4]:<20} "
             +
             Back.RESET + Fore.RESET
         )
@@ -180,12 +180,12 @@ def display():
             #print(Back.BLACK + Fore.RED+ f"TIME: {zombie[5]} R_IP: {zombie[0]} R_PORT: {zombie[1]} L_IP: {zombie[2]} L_PORT: {zombie[3]} PID: {zombie[4]} RESULT: zombie" +  Back.RESET + Fore.RESET)
             print(
                 Back.BLACK + Fore.RED +
-                f"{zombie[5]:<25} "
+                f"{zombie[5]:<35} "
                 f"{zombie[0]:<15} "
-                f"{zombie[1]:<10} "
-                f"{zombie[2]:<15} "
-                f"{zombie[3]:<10} "
-                f"{zombie[4]:<10} "
+                f"{zombie[1]:<20} "
+                f"{zombie[2]:<25} "
+                f"{zombie[3]:<20} "
+                f"{zombie[4]:<20} "
                 "ZOMBIE" +
                 Back.RESET + Fore.RESET
             )
@@ -200,13 +200,13 @@ def kill():
             keys = ['R_IP', 'R_PORT', 'L_IP', 'L_PORT', 'STATE', 'TIME', 'PID']
             print(
             Back.WHITE + Fore.BLACK +
-            f"{keys[5]:<29} "
+            f"{keys[5]:<39} "
             f"{keys[0]:<10} "
-            f"{keys[1]:<13} "
-            f"{keys[2]:<12} "
-            f"{keys[3]:<10} "
-            f"{keys[6]:<12} "
-            f"{keys[4]:<10} "
+            f"{keys[1]:<23} "
+            f"{keys[2]:<22} "
+            f"{keys[3]:<20} "
+            f"{keys[6]:<22} "
+            f"{keys[4]:<20} "
             +
             Back.RESET + Fore.RESET
         )
@@ -221,12 +221,12 @@ def kill():
                 elif cli_mode:
                     print(
                 Back.BLACK + Fore.RED +
-                f"{zombie[5]:<25} "
+                f"{zombie[5]:<35} "
                 f"{zombie[0]:<15} "
-                f"{zombie[1]:<10} "
-                f"{zombie[2]:<15} "
-                f"{zombie[3]:<10} "
-                f"{zombie[4]:<10} "
+                f"{zombie[1]:<20} "
+                f"{zombie[2]:<25} "
+                f"{zombie[3]:<20} "
+                f"{zombie[4]:<20} "
                 "KILLED" +
                 Back.RESET + Fore.RESET
             )
@@ -236,12 +236,12 @@ def kill():
                 elif cli_mode:
                     print(
                 Back.BLACK + Fore.RED +
-                f"{zombie[5]:<25} "
+                f"{zombie[5]:<35} "
                 f"{zombie[0]:<15} "
-                f"{zombie[1]:<10} "
-                f"{zombie[2]:<15} "
-                f"{zombie[3]:<10} "
-                f"{zombie[4]:<10} "
+                f"{zombie[1]:<20} "
+                f"{zombie[2]:<25} "
+                f"{zombie[3]:<20} "
+                f"{zombie[4]:<20} "
                 "KILL NOT POSSIBLE NO PID" +
                 Back.RESET + Fore.RESET
             )
@@ -283,4 +283,14 @@ def run(cli = True, silent = False):
         sched.start()
         while True:
             time.sleep(1)
+
+def set_kernel_params():
+    commands = [
+        ["sudo", "sysctl", "-w", "net.ipv4.tcp_keepalive_intvl= 1"],
+        ["sudo", "sysctl", "-w", "net.ipv4.tcp_keepalive_probes= 40"],
+        ["sudo", "sysctl", "-w", "net.ipv4.tcp_keepalive_time= 60"],
+        ["sudo","sysctl","--system"]]
+
+    for command in commands:
+        subprocess.call(command)
 
