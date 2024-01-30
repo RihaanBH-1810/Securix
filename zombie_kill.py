@@ -7,6 +7,7 @@ from colorama import Fore, Back, Style
 import logging, os
 from datetime import datetime
 
+
 not_interested = ["LISTEN", "NONE", "SYN_SENT"]
 connections_list = []
 working = []
@@ -33,6 +34,9 @@ banner = Fore.RED +  """
 """  + Fore.RESET
 sudo_message = Fore.RED + "You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting " + Fore.RESET
 line = "------------------------------------------------------------------------------------------------------"
+backgorund_message = """The scipt is running ,If you want view logs open output log file in the package folder
+                        minimize this terminal and get on with your work. [Press ctrl+c to stop]
+                            """
 
 
 def dispose():
@@ -257,14 +261,24 @@ def z_kill():
     kill()
     dispose()
 
-if __name__ == "__main__":
+def run(cli = True, silent = False):
+    global cli_mode
     if os.geteuid() != 0:
         print(banner + "\n" + line + "\n" + sudo_message +"\n"+  line) 
         exit()
-    if cli_mode == True:
-        print(banner)
+    if cli == True and silent == False:
+        cli_mode = True
+        print(banner + "\n" + line)
         z_kill()
-    if cli_mode == False:
+    if cli == False and silent == False:
+        print(banner + "\n" + line + "\n" + backgorund_message + "\n" + line)
+        z_kill()
+        sched.add_job(z_kill, 'interval', seconds=20)
+        sched.start()
+        while True:
+            time.sleep(1)
+    if cli == False and silent == True:
+        z_kill()
         sched.add_job(z_kill, 'interval', seconds=20)
         sched.start()
         while True:
