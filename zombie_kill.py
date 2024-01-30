@@ -16,8 +16,9 @@ ignored_list = []
 result_queue = Queue()
 zombie_queue = Queue()
 sched = BackgroundScheduler()
-
-
+cli_mode = False
+logging.basicConfig(level=logging.INFO, filename="output.log", filemode="a",  format=' %(levelname)s - %(message)s')
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 banner = Fore.RED +  """
   ██████ ▓█████  ▄████▄   █    ██  ██▀███   ██▓   ▒██   ██▒
 ▒██    ▒ ▓█   ▀ ▒██▀ ▀█   ██  ▓██▒▓██ ▒ ██▒▓██▒   ▒▒ █ █ ▒░
@@ -50,7 +51,7 @@ def setup():
 
 def probe_the_port(ip, port, pid, l_ip, l_port,  ip6=False, result_queue=None, zombie_queue=None):
     zombie_count = 0
-    
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     for i in range(7):
         if ip6:
             packet = IPv6(dst=ip) / TCP(dport=port, flags="S",)
@@ -64,9 +65,9 @@ def probe_the_port(ip, port, pid, l_ip, l_port,  ip6=False, result_queue=None, z
             zombie_count += 1  
 
     if zombie_count == 7:
-        zombie_queue.put((ip, port, l_ip, l_port, pid, datetime.now()))  
+        zombie_queue.put((ip, port, l_ip, l_port, pid, current_time))  
     else:
-        result_queue.put((ip, port, l_ip, l_port, ans[0][1].sprintf('%TCP.flags%'), datetime.now))
+        result_queue.put((ip, port, l_ip, l_port, ans[0][1].sprintf('%TCP.flags%'), current_time))
 
 def start_scan():
     if connections_list:
@@ -94,40 +95,166 @@ def start_scan():
 #( 'family',  'laddr', 'raddr', 'status', 'pid')
 
 def display():
-    print(Fore.WHITE + "Currently running TCP sessions that will be monitored  : " + Fore.RESET)
-    print(f"ADDR FAMILY L_IP L_PORT R_IP R_PORT PROCESS_ID ")
-    for con in connections_list:
-        print(Back.RED + f"{con.family}" + Back.RESET)
+    if cli_mode != True:
+        for work in working:
+            logging.info(f"TIME: {work[5]} R_IP: {work[0]} R_PORT: {work[1]} L_IP: {work[2]} L_PORT: {work[3]} RESPONSE: {work[4]} RESULT: working")
+        for zombie in zombie_list: 
+            logging.info(f"TIME: {zombie[5]} R_IP: {zombie[0]} R_PORT: {zombie[1]} L_IP: {zombie[2]} L_PORT: {zombie[3]} PID: {zombie[4]} RESULT: zombie")
+    elif cli_mode:  
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S") 
+        print(Fore.BLACK + Back.WHITE + "CURRENTLY RUNNING TCP SESSIONS THAT WILL BE MONITORED  : " + Back.RESET + Fore.RESET + "\n")
+        keys = ['R_IP', 'R_PORT', 'L_IP', 'L_PORT', 'STATE', 'TIME']
+        print(
+            Back.WHITE + Fore.BLACK +
+            f"{keys[5]:<29} "
+            f"{keys[0]:<10} "
+            f"{keys[1]:<13} "
+            f"{keys[2]:<12} "
+            f"{keys[3]:<15} "
+            f"{keys[4]:<10} "
+            +
+            Back.RESET + Fore.RESET
+        )
+        for con in connections_list:
+            #print(f"R_IP: {con.raddr[0]} R_PORT: {con.raddr[1]} L_IP: {con.laddr[0]} L_PORT: {con.laddr[1]} STATE: {con.status}")
+            print(
+                Back.BLACK + Fore.WHITE +
+                f"{current_time:<25} "
+                f"{con.raddr[0]:<15} "
+                f"{con.raddr[1]:<10} "
+                f"{con.laddr[0]:<15} "
+                f"{con.laddr[1]:<10} "
+                f"{con.status:<10} "
+                +
+                Back.RESET + Fore.RESET
+            )
 
+        keys = ['R_IP', 'R_PORT', 'L_IP', 'L_PORT', 'STATE', 'TIME', 'RESPONSE']
+        print("\n")
+        print(Fore.BLACK + Back.WHITE + "AFTER RUNNING DIAGNOSIS  : " + Back.RESET + Fore.RESET + "\n")
+        
+        print(
+            Back.WHITE + Fore.BLACK +
+            f"{keys[5]:<29} "
+            f"{keys[0]:<10} "
+            f"{keys[1]:<13} "
+            f"{keys[2]:<12} "
+            f"{keys[3]:<10} "
+            f"{keys[6]:<12} "
+            f"{keys[4]:<10} "
+            +
+            Back.RESET + Fore.RESET
+        )
+        for work in working:
+            print(
+                Back.BLACK + Fore.GREEN +
+                f"{work[5]:<25} "
+                f"{work[0]:<15} "
+                f"{work[1]:<10} "
+                f"{work[2]:<15} "
+                f"{work[3]:<10} "
+                f"{work[4]:<10} "
+                "working" +
+                Back.RESET + Fore.RESET
+            )
+        
+        if len(zombie_list) != 0:
+            keys = ['R_IP', 'R_PORT', 'L_IP', 'L_PORT', 'STATE', 'TIME', 'PID']
+            print(
+            Back.WHITE + Fore.BLACK +
+            f"{keys[5]:<29} "
+            f"{keys[0]:<10} "
+            f"{keys[1]:<13} "
+            f"{keys[2]:<12} "
+            f"{keys[3]:<10} "
+            f"{keys[6]:<12} "
+            f"{keys[4]:<10} "
+            +
+            Back.RESET + Fore.RESET
+        )
+        for zombie in zombie_list: 
+            #print(Back.BLACK + Fore.RED+ f"TIME: {zombie[5]} R_IP: {zombie[0]} R_PORT: {zombie[1]} L_IP: {zombie[2]} L_PORT: {zombie[3]} PID: {zombie[4]} RESULT: zombie" +  Back.RESET + Fore.RESET)
+            print(
+                Back.BLACK + Fore.RED +
+                f"{zombie[5]:<25} "
+                f"{zombie[0]:<15} "
+                f"{zombie[1]:<10} "
+                f"{zombie[2]:<15} "
+                f"{zombie[3]:<10} "
+                f"{zombie[4]:<10} "
+                "ZOMBIE" +
+                Back.RESET + Fore.RESET
+            )
+        print("\n")
 
 
 def kill():
-    print("Working:")
-    for work in working:
-        print(work)
-
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S") 
     if len(zombie_list) != 0:
-        print("Zombie:")
+        if cli_mode:
+            print(Fore.BLACK + Back.WHITE + "AFTER PERFORMING CLEANUP  : " + Back.RESET + Fore.RESET + "\n")
+            keys = ['R_IP', 'R_PORT', 'L_IP', 'L_PORT', 'STATE', 'TIME', 'PID']
+            print(
+            Back.WHITE + Fore.BLACK +
+            f"{keys[5]:<29} "
+            f"{keys[0]:<10} "
+            f"{keys[1]:<13} "
+            f"{keys[2]:<12} "
+            f"{keys[3]:<10} "
+            f"{keys[6]:<12} "
+            f"{keys[4]:<10} "
+            +
+            Back.RESET + Fore.RESET
+        )
         for zombie in zombie_list:
-            print(f"Killing connection on local port {zombie[4]}")
             pid = zombie[4]
-            print(zombie)
-            print(pid)
-            if pid != None:
+            if pid is not None:
                 s_pid = str(pid)
                 subprocess.call(["kill", "-9", s_pid])
-            
-            if pid == None:
-                print(f"found without pid on port {zombie[3]}")
+                if  cli_mode != True:
+                    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    logging.info(f"TIME: {current_time} R_IP: {zombie[0]} R_PORT: {zombie[1]} L_IP: {zombie[2]} L_PORT: {zombie[3]} PID: {zombie[4]} STATE: KILLED")
+                elif cli_mode:
+                    print(
+                Back.BLACK + Fore.RED +
+                f"{zombie[5]:<25} "
+                f"{zombie[0]:<15} "
+                f"{zombie[1]:<10} "
+                f"{zombie[2]:<15} "
+                f"{zombie[3]:<10} "
+                f"{zombie[4]:<10} "
+                "KILLED" +
+                Back.RESET + Fore.RESET
+            )
+            else:
+                if cli_mode != True:
+                    logging.info(f"TIME: {current_time} R_IP: {zombie[0]} R_PORT: {zombie[1]} L_IP: {zombie[2]} L_PORT: {zombie[3]} PID: {zombie[4]} STATE: KILL NOT SUCCESSFUL")
+                elif cli_mode:
+                    print(
+                Back.BLACK + Fore.RED +
+                f"{zombie[5]:<25} "
+                f"{zombie[0]:<15} "
+                f"{zombie[1]:<10} "
+                f"{zombie[2]:<15} "
+                f"{zombie[3]:<10} "
+                f"{zombie[4]:<10} "
+                "KILL NOT POSSIBLE NO PID" +
+                Back.RESET + Fore.RESET
+            )
     else:
-        print("No Zombies detected !!! ")
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if cli_mode != True:
+            logging.info(f"NO ZOMBIES DETECTED. TIME : {current_time}")
+        else:
+            print(Back.GREEN + Fore.WHITE + f"NO ZOMBIES DETECTED. TIME : {current_time}" + Back.RESET + Fore.RESET)
+
 
 
 def z_kill():
     setup()
     start_scan()
     display()
-    #kill()
+    kill()
     dispose()
 
 if __name__ == "__main__":
@@ -135,8 +262,9 @@ if __name__ == "__main__":
         print(banner + "\n" + line + "\n" + sudo_message +"\n"+  line) 
         exit()   
     print(banner)
-    sched.add_job(z_kill, 'interval', seconds=20)
-    sched.start()
-    while True:
-        time.sleep(1)
+    z_kill()
+    #sched.add_job(z_kill, 'interval', seconds=20)
+    #sched.start()
+    #while True:
+    #    time.sleep(1)
 
