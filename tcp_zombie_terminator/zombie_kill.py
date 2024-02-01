@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from colorama import Fore, Back, Style
 import logging, os
 from datetime import datetime
+import click
 
 
 not_interested = ["LISTEN", "NONE", "SYN_SENT"]
@@ -38,6 +39,16 @@ backgorund_message = """The scipt is running ,If you want view logs open output 
                         minimize this terminal and get on with your work. [Press ctrl+c to stop]
                             """
 
+message = """
+Thank you for using securix . (Note you need sudo permissions to run this script !!)
+There are three modes in which you can run this : 
+    1.single_run (or S): One Time run with output displayed in the terminal 
+    2.background_run (or B): Runs in the background in fixed intervals and logs the output into a log file
+    3.set_params (or P): Just changes the keep_alive parameters in kernel parameters 
+
+
+"""
+default_prompt = banner + "\n" + line + "\n"+ message
 
 def dispose():
     connections_list.clear()
@@ -263,9 +274,7 @@ def z_kill():
 
 def run(cli = True, silent = False):
     global cli_mode
-    if os.geteuid() != 0:
-        print(banner + "\n" + line + "\n" + sudo_message +"\n"+  line) 
-        exit()
+    
     if cli == True and silent == False:
         cli_mode = True
         print(banner + "\n" + line)
@@ -277,12 +286,7 @@ def run(cli = True, silent = False):
         sched.start()
         while True:
             time.sleep(1)
-    if cli == False and silent == True:
-        z_kill()
-        sched.add_job(z_kill, 'interval', seconds=20)
-        sched.start()
-        while True:
-            time.sleep(1)
+    
 
 def set_kernel_params():
     commands = [
@@ -294,3 +298,22 @@ def set_kernel_params():
     for command in commands:
         subprocess.call(command)
 
+@click.command()
+@click.option("-m", "--mode", prompt=default_prompt)
+def set_mode(mode):
+    if os.geteuid() != 0:
+        print(sudo_message) 
+        exit()
+    if mode == "S" or mode == "single_run" or mode == "1":
+        run(True, False)
+
+    elif mode == "B" or mode == "background_run" or mode == "2":
+        run(False, False)
+    elif mode == "P" or mode == " set_params" or mode == "3":
+        set_kernel_params()
+    else:
+        print(Fore.RED + "No such mode !!, Please try again exiting()")
+        exit()
+
+def run_the_script_with_modes():
+    set_mode()
