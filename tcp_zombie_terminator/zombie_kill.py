@@ -309,7 +309,7 @@ def set_mode(mode):
 
     elif mode == "B" or mode == "background_run" or mode == "2":
         run(False, False)
-    elif mode == "P" or mode == " set_params" or mode == "3":
+    elif mode == "P" or mode == "set_params" or mode == "3":
         set_kernel_params()
     else:
         print(Fore.RED + "No such mode !!, Please try again exiting()")
