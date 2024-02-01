@@ -13,5 +13,5 @@
 * To setup run cmd : ```source/py_run.sh```
 * To run the script once in terminal with output:   ```securix -m single_run``` or  ```securix -m S```
 * To run the script in background:  ```securix -m background_run``` or ```securix -m B``` 
-* To set the kernel params for keep alive:  ```securix -m  set_params``` or ```securix -m P```
+* To set the kernel params for keep alive:  ```securix -m set_params``` or ```securix -m P```
    
